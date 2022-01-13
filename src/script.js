@@ -1,7 +1,6 @@
 import { Item } from "./class.js";
 import { spinBot, stopBot } from "./botSelection.js";
 
-
 const box = document.getElementById("alert-box");
 const choices = document.querySelectorAll("img");
 const timerEl = document.getElementById("countdown-field");
@@ -16,20 +15,37 @@ const score = {
   botScore: 0,
 };
 
+function giveFeedback(feedback) {
+  box.innerHTML = feedback;
+  box.classList.remove("hide");
+}
+
+function resetScore() {
+  setTimeout(() => {
+    score.humanScore = 0; 
+    score.botScore = 0; 
+    box.innerHTML = "";
+    updateScore();
+  }, 1000);
+}
 let timer = 3;
 let timerId;
 
 spinBot();
-box.innerHTML="";
 
 function startTimer() {
   if (timerId) clearInterval(timerId);
   timer = 3;
   timerId = setInterval(() => {
+    if (timer == -1) {
+      clearInterval(timerId);
+      timer--;
+      return;
+    }
     timerEl.innerHTML = timer--;
-    if (timer == -1) clearInterval(timerId);
   }, 1000);
 }
+
 startTimer();
 
 const scoreBoard = document.getElementById("score-field");
@@ -43,36 +59,50 @@ choices.forEach((choice) => {
     humanChoice = allChoices.find(
       (item) => e.target.getAttribute("value") === item.name
     );
-    console.log(humanChoice);
+    console.log(humanChoice.name);
 
     let botChoice = allChoices[Math.floor(Math.random() * allChoices.length)];
     stopBot(botChoice.name);
+    console.log(botChoice.name);
 
+    console.log(timer)
+    if (timer != -1) {
+      giveFeedback("Computer gets a point")
+      score.botScore++;
+    } else {
       if (humanChoice.weakness == botChoice.name) {
-        box.innerHTML="Computer gets a point"
+        giveFeedback("Computer gets a point")
         score.botScore++;
       }
       if (humanChoice.name == botChoice.weakness) {
-        box.innerHTML="Human gets a point"
+        giveFeedback("Human gets a point")
         score.humanScore++;
-
       }
-    
+
+      if (humanChoice.name === botChoice.name) {
+        giveFeedback("Draw")
+        box.classList.remove("hide");
+      }
+
+    }
     if (score.botScore == 2) {
-      box.innerHTML="Computer Wins";
-      setTimeout(() => {  score.humanScore = 0; score.botScore = 0; box.innerHTML="" }, 1000);
+      giveFeedback("Computer wins")
+      const wantToPlay = confirm("Wanna play again?");
+      if (!wantToPlay) location.replace("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+      resetScore()
       
     } else if (score.humanScore == 2) {
-      box.innerHTML="Human Wins!";
-      setTimeout(() => {  score.humanScore = 0; score.botScore = 0; box.innerHTML = ""}, 1000);
+      giveFeedback("Human wins")
+      const wantToPlay = confirm("Wanna play again?");
+      if (!wantToPlay) location.replace("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+      resetScore();
     }
     updateScore();
     setTimeout(() => {
       startTimer();
       spinBot();
-    }, 2000);
+      box.classList.add("hide");
+    }, 1000);
     humanChoice = null;
   });
 });
-
-

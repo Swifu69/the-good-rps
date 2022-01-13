@@ -1,20 +1,18 @@
 let intervalID = null;
 
 const images = [
-  "sources/paper.png",
-  "sources/scissors.png",
-  "sources/rock.png",
+  "assets/paper.png",
+  "assets/scissors.png",
+  "assets/rock.png",
 ];
 const botImage = document.getElementById("bot");
+
 export function spinBot() {
-  function roulette() {
-    let index = images.length - 1;
-    intervalID = setInterval(() => {
-      botImage.src = images[index--];
-      if (index == -1) index = images.length - 1;
-    }, 500);
-  }
-  roulette();
+  let index = images.length - 1;
+  intervalID = setInterval(() => {
+    botImage.src = images[index--];
+    if (index == -1) index = images.length - 1;
+  }, 500);
 }
 
 /**
